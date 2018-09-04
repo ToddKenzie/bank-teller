@@ -1,3 +1,4 @@
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import java.util.Collection;
@@ -22,6 +23,7 @@ public class BankTest {
 		account2 = new Account("2", "Savings", 500);
 		underTest.openNewAccount(account1);
 	}
+	
 	@Test
 	public void assertBankAccountIsAdded() {
 		Account retrievedAccount = underTest.getAccount("1");
@@ -57,6 +59,38 @@ public class BankTest {
 		assertThat(retrievedAccount, is(nullValue()));
 	}
 	
+	
+	@Test
+	public void assertThatDepositInAct1for100MakesBalance200() {
+		Account retrievedAccount = underTest.getAccount(account1.getAccountNumber());
+		retrievedAccount.deposit(100);
+		assertEquals(200, retrievedAccount.checkAccountBalance());
+	}
+
+	@Test
+	public void assertThatDepositInAct1for200MakesBalance300() {
+		Account retrievedAccount = underTest.getAccount(account1.getAccountNumber());
+		retrievedAccount.deposit(200);
+		assertEquals(300, retrievedAccount.checkAccountBalance());
+	}
+	
+	@Test
+	public void assertThatWithdrawInAct1For50MakesBalance50() {
+		account1.withdraw(50);
+		assertEquals(50, account1.checkAccountBalance());
+	}
+	
+	@Test
+	public void assertThatWithdrawInAct1For100MakesBalance0() {
+		account1.withdraw(100);
+		assertEquals(0, account1.checkAccountBalance());
+	}
+	
+	@Test
+	public void assertThatWithdrawInAct1For200MakesBalance0() {
+		account1.withdraw(200);
+		assertEquals(0, account1.checkAccountBalance());
+	}
 	
 	
 	
