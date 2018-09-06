@@ -5,7 +5,12 @@ import java.util.Map;
 public class Bank {
 
 	Map<String, Account> accounts = new HashMap<>();
+	private Object accessPin;
 	
+	public Bank(String accessPin) {
+		this.accessPin = accessPin;
+	}
+
 	public void openNewAccount(Account account) {
 		accounts.put(account.getAccountNumber(), account);
 	}
@@ -20,6 +25,10 @@ public class Bank {
 
 	public void closeAccount(String accountNumber) {
 		accounts.remove(accountNumber);
+	}
+
+	public boolean verifyAccess(String userEnteredPin) {
+		return (userEnteredPin.equals(accessPin));
 	}
 
 }

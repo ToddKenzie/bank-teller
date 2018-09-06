@@ -2,7 +2,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 
@@ -17,7 +19,7 @@ public class BankTest {
 	
 	@Before
 	public void setUp() {
-		underTest = new Bank();
+		underTest = new Bank("1234");
 		account1 = new Account("1", "Checking", 100);
 		account2 = new Account("2", "Savings", 500);
 		underTest.openNewAccount(account1);
@@ -91,6 +93,17 @@ public class BankTest {
 		assertEquals(0, account1.checkAccountBalance());
 	}
 	
+	@Test
+	public void assertAccessToAccountWithCorrectPin() {
+		boolean access = underTest.verifyAccess("1234");
+		assertTrue(access);
+	}
+	
+	@Test
+	public void assertDeniedAccessToAccountwithIncorrectPin() {
+		boolean access = underTest.verifyAccess("1235");
+		assertFalse(access);
+	}
 	
 	
 }

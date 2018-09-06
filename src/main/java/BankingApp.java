@@ -8,14 +8,12 @@ public class BankingApp {
 	}
 
 	private static Bank wcciBank;
-	private static Account accountA;
-	private static Account accountB;
 	private static Scanner input;
 	
 	public static void bankStartUp() {
-		wcciBank = new Bank();
-		accountA = new Account("1234", "Checking", 2000);
-		accountB = new Account("5678", "Savings", 5000);
+		wcciBank = new Bank("1234");
+		Account accountA = new Account("1234", "Checking", 2000);
+		Account accountB = new Account("5678", "Savings", 5000);
 		wcciBank.openNewAccount(accountA);
 		wcciBank.openNewAccount(accountB);
 		input = new Scanner(System.in);
@@ -23,8 +21,39 @@ public class BankingApp {
 	
 	public static void banking() {
 		bankStartUp();
+		gainAccess();
 		displayAccounts();
 		bankMenu();
+	}
+	
+	public static void gainAccess() {
+		if (hasUserVerifiedPin()) {
+			System.out.println("\nWelcome to the Bank of We Can Code IT!");
+		} else {
+			denyAccess();
+		}
+	}
+	
+	public static boolean hasUserVerifiedPin() {
+		int attemptsRemainAtEnteringPin = 3;
+		boolean isEnteredPinCorrect;
+		do {
+			System.out.println("Please enter your PIN to access your accounts");
+			String userEnteredPin = input.nextLine();
+			isEnteredPinCorrect = wcciBank.verifyAccess(userEnteredPin);
+			if (!isEnteredPinCorrect) {
+				attemptsRemainAtEnteringPin--;
+				String display = "PIN Incorrect. You have " + attemptsRemainAtEnteringPin;
+				String display2 = (attemptsRemainAtEnteringPin == 1) ? " attempt remaining." :" attempts remaining.";
+				System.out.println(display + display2);
+			}
+		} while (!isEnteredPinCorrect && attemptsRemainAtEnteringPin > 0);
+		return isEnteredPinCorrect;
+	}
+	
+	public static void denyAccess() {
+		System.out.println("You have exhausted your attempts.\nPlease call the bank to unlock your account.");
+		System.exit(0);
 	}
 	
 	public static void displayAccounts() {
@@ -45,12 +74,10 @@ public class BankingApp {
 	}
 	
 	public static void displayMainMenu() {
-		System.out.println("What would you like to do next?");
-		System.out.println("Press 1 to deposit");
-		System.out.println("Press 2 to withdraw");
-		System.out.println("Press 3 to check balance");
-		System.out.println("Press 4 to close account");
-		System.out.println("Press 0 to exit\n");
+		String display = "What would you like to do next?\nPress 1 to deposit\n";
+		display += "Press 2 to withdraw\nPress 3 to check balance\n";
+		display += "Press 4 to close account\nPress 5 to create new account\nPress 0 to exit\n";
+		System.out.println(display);
 	}
 	
 	private static void executeMainMenuCommand(String userMainInput) {
@@ -61,16 +88,15 @@ public class BankingApp {
 		} else if (userMainInput.equals("3")) {
 			displayAccounts();
 		} else if (userMainInput.equals("4")) {
-			executeAccountClosure();
+			executeAccountClosure();	
+		} else if (userMainInput.equals("5")) {
+			createNewAccount();
 		} else if (userMainInput.equals("0")) {
 			exitProgram();
 		} else {
 			System.out.println("Invalid command.");
 		}
 	}
-
-	// With the way you're writing executeDeposit/Withdraw/Closure - is this a case
-	// for inheritance (in a normal - not main method - situation)?
 	
 	private static void executeDeposit() {
 		displayAccounts();
@@ -126,6 +152,35 @@ public class BankingApp {
 		}
 	}
 
+	private static void createNewAccount() {
+		String accountType = verifyAccountType();
+		String accountNumber = generateAccountNumber();
+		Account newAccount = new Account(accountNumber, accountType, 0);
+		wcciBank.openNewAccount(newAccount);
+		System.out.println("Account " + accountNumber + " created.");
+	}
+	
+	private static String generateAccountNumber() {
+		String accountNumber;
+		do {
+			Integer number = (int)(Math.random() * 8999 + 1000);
+			accountNumber = number.toString();
+		} while (wcciBank.accounts.containsKey(accountNumber));
+		return accountNumber;	
+	}
+	
+	private static String verifyAccountType() {
+		String userEnteredData;
+		do {
+			System.out.println("Which type of account?  Checking or savings?");
+			userEnteredData = input.nextLine();
+			if (!userEnteredData.equalsIgnoreCase("checking") && !userEnteredData.equalsIgnoreCase("savings")) {
+				System.out.println("Invalid Account Type.");
+			}
+		} while (!userEnteredData.equalsIgnoreCase("checking") && !userEnteredData.equalsIgnoreCase("savings"));
+		return userEnteredData.substring(0,1).toUpperCase() + userEnteredData.substring(1).toLowerCase();
+	}
+	
 	private static Account retrieveAccount() {
 		String accountNumber = input.nextLine();
 		return wcciBank.getAccount(accountNumber);
