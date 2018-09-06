@@ -1,9 +1,10 @@
+import java.math.BigDecimal;
 
 public class Account {
 
 	private String accountNumber;
 	private String accountType;
-	private int accountBalance;
+	private BigDecimal accountBalance;
 
 	public String getAccountNumber() {
 		return accountNumber;
@@ -13,30 +14,32 @@ public class Account {
 		return accountType;
 	}
 	
-	public int checkAccountBalance() {
-		return accountBalance;
+	public BigDecimal checkAccountBalance() {
+		return accountBalance.setScale(2, BigDecimal.ROUND_HALF_UP);
 	}
 	
-	public Account(String accountNumber, String accountType, int accountBalance) {
+	public Account(String accountNumber, String accountType, String accountBalance) {
 		this.accountNumber = accountNumber;
 		this.accountType = accountType;
-		this.accountBalance = accountBalance;
+		this.accountBalance = new BigDecimal(accountBalance);
 	}
 
-	public void deposit(int depositAmount) {
-		accountBalance += depositAmount;
+	public void deposit(String depositAmount) {
+		BigDecimal deposit = new BigDecimal(depositAmount);
+		accountBalance = accountBalance.add(deposit);
 	}
 
-	public void withdraw(int withdrawAmount) {
-		if (withdrawAmount > accountBalance) {
-			accountBalance = 0;
+	public void withdraw(String withdrawAmount) {
+		BigDecimal withdrawal = new BigDecimal(withdrawAmount);
+		if (withdrawal.compareTo(accountBalance) == 1) {
+			accountBalance = accountBalance.add(accountBalance.negate());
 		} else {
-		accountBalance -= withdrawAmount;
+		accountBalance = accountBalance.subtract(withdrawal);
 		}
 	}
 	
 	public String toString() {
-		return "(" + accountNumber + ") " + accountType + "\t" + accountBalance;
+		return "(" + accountNumber + ") " + accountType + "\t$" + accountBalance.setScale(2, BigDecimal.ROUND_HALF_UP);
 	}
 
 

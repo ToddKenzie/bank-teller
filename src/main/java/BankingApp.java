@@ -1,4 +1,7 @@
+import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class BankingApp {
@@ -9,11 +12,12 @@ public class BankingApp {
 
 	private static Bank wcciBank;
 	private static Scanner input;
+	private static NumberFormat currency = NumberFormat.getCurrencyInstance(Locale.US);
 	
 	public static void bankStartUp() {
 		wcciBank = new Bank("1234");
-		Account accountA = new Account("1234", "Checking", 2000);
-		Account accountB = new Account("5678", "Savings", 5000);
+		Account accountA = new Account("1234", "Checking", "2000");
+		Account accountB = new Account("5678", "Savings", "5000");
 		wcciBank.openNewAccount(accountA);
 		wcciBank.openNewAccount(accountB);
 		input = new Scanner(System.in);
@@ -104,10 +108,9 @@ public class BankingApp {
 		Account accountToEdit = retrieveAccount();
 		if (accountToEdit != null) {
 			System.out.println("How much would you like to deposit?");
-			String userInput = input.nextLine();
-			int depositAmount = checkIfValid(userInput);
+			String depositAmount = receiveValidInput();
 			accountToEdit.deposit(depositAmount);
-			System.out.println(depositAmount + " was deposited into the account\n");
+			System.out.println(convertToCurrency(depositAmount) + " was deposited into the account\n");
 			
 		} else {
 			System.out.println("Invalid account choice.  Returning to main menu.\n");
@@ -120,15 +123,15 @@ public class BankingApp {
 		Account accountToEdit = retrieveAccount();
 		if (accountToEdit != null) {
 			System.out.println("How much would you like to withdraw?");
-			String userInput = input.nextLine();
-			int withdrawAmount = checkIfValid(userInput);
-			if (withdrawAmount > accountToEdit.checkAccountBalance()) {
+			String withdrawAmount = receiveValidInput();
+			BigDecimal withdrawal = new BigDecimal(withdrawAmount);
+			if (withdrawal.compareTo(accountToEdit.checkAccountBalance()) == 1) {
 				System.out.println("That is more money than exists in the account.");
 				System.out.println(accountToEdit.checkAccountBalance() + " will be withdrawn instead");
-				withdrawAmount = accountToEdit.checkAccountBalance();
+				withdrawal = accountToEdit.checkAccountBalance();
 			}
 			accountToEdit.withdraw(withdrawAmount);
-			System.out.println(withdrawAmount + " was withdrawn from the account\n");
+			System.out.println(currency.format(withdrawal) + " was withdrawn from the account\n");
 
 		} else {
 			System.out.println("Invalid account choice.  Returning to main menu.\n");
@@ -140,7 +143,7 @@ public class BankingApp {
 		System.out.println("Enter the account you wish to close");
 		Account accountToEdit = retrieveAccount();
 		if (accountToEdit != null) {
-			if (accountToEdit.checkAccountBalance() > 0) {
+			if (accountToEdit.checkAccountBalance().compareTo(BigDecimal.ZERO) > 0) {
 				System.out.println("We cannot close this account.  Please withdraw all money prior to closing the account.\n");
 			} else {
 				System.out.println("Closing account " + accountToEdit.getAccountNumber() + "\n");
@@ -155,7 +158,7 @@ public class BankingApp {
 	private static void createNewAccount() {
 		String accountType = verifyAccountType();
 		String accountNumber = generateAccountNumber();
-		Account newAccount = new Account(accountNumber, accountType, 0);
+		Account newAccount = new Account(accountNumber, accountType, "0");
 		wcciBank.openNewAccount(newAccount);
 		System.out.println("Account " + accountNumber + " created.");
 	}
@@ -186,16 +189,26 @@ public class BankingApp {
 		return wcciBank.getAccount(accountNumber);
 	}
 	
-	private static int checkIfValid(String userInput) {
-		int amount = 0;
-		try {
-			amount = Integer.parseInt(userInput);
-		} catch (NumberFormatException ex) {
-			System.out.println("The value entered is not a number.");
-		}
-		return amount;
+	private static String receiveValidInput() {
+		String userInput;
+		boolean inputValid = false;
+		do {
+			userInput = input.nextLine();
+			try {
+				@SuppressWarnings("unused")
+				BigDecimal convertCheck = new BigDecimal(userInput);
+				inputValid = true;
+			} catch (NumberFormatException ex) {
+				System.out.println("The value entered is not a number.");
+			}
+		} while (!inputValid);
+		return userInput;
 	}
 
+	private static String convertToCurrency(String value) {
+		BigDecimal money = new BigDecimal(value);
+		return currency.format(money);
+	}
 	
 	private static void exitProgram() {
 		System.out.println("Thank you for banking with us.");
