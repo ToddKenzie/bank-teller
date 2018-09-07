@@ -5,7 +5,7 @@ import java.util.Map;
 public class Bank {
 
 	Map<String, Account> accounts = new HashMap<>();
-	private Object accessPin;
+	private String accessPin;
 	
 	public Bank(String accessPin) {
 		this.accessPin = accessPin;

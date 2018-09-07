@@ -27,16 +27,15 @@ public class BankingApp {
 	public static void banking() {
 		bankStartUp();
 		gainAccess();
-		displayAccounts();
 		bankMenu();
 	}
 
 	public static void gainAccess() {
-		if (hasUserVerifiedPin()) {
-			System.out.println("\nWelcome to the Bank of We Can Code IT!");
-		} else {
+		if (!hasUserVerifiedPin()) {
 			denyAccess();
 		}
+		System.out.println("\nWelcome to the Bank of We Can Code IT!");
+		displayAccounts();
 	}
 
 	public static boolean hasUserVerifiedPin() {
@@ -128,10 +127,10 @@ public class BankingApp {
 		BigDecimal withdrawal = new BigDecimal(withdrawAmount);
 		if (withdrawal.compareTo(accountToEdit.checkAccountBalance()) == 1) {
 			System.out.println("That is more money than exists in the account.");
-			System.out.println(currency.format(accountToEdit.checkAccountBalance()) + " will be withdrawn instead");
+			System.out.println(convertToCurrency(accountToEdit.checkAccountBalance()) + " will be withdrawn instead");
 			withdrawal = accountToEdit.checkAccountBalance();
 		}
-		System.out.println(currency.format(withdrawal) + " was withdrawn from the account\n");
+		System.out.println(convertToCurrency(withdrawal) + " was withdrawn from the account\n");
 	}
 
 	private static void executeAccountClosure() {
@@ -170,7 +169,7 @@ public class BankingApp {
 	private static String generateAccountNumber() {
 		String accountNumber;
 		do {
-			Integer number = (int) (Math.random() * 8999 + 1000);
+			Integer number = (int) (Math.random() * 9000 + 1000);
 			accountNumber = number.toString();
 		} while (wcciBank.accounts.containsKey(accountNumber));
 		return accountNumber;
@@ -214,6 +213,10 @@ public class BankingApp {
 		return currency.format(money);
 	}
 
+	private static String convertToCurrency(BigDecimal value) {
+		return currency.format(value);
+	}
+	
 	private static void exitProgram() {
 		System.out.println("Thank you for banking with us.");
 		System.exit(0);
