@@ -10,10 +10,6 @@ public class Account {
 		return accountNumber;
 	}
 	
-	public String getAccountType() {
-		return accountType;
-	}
-	
 	public BigDecimal checkAccountBalance() {
 		return accountBalance.setScale(2, BigDecimal.ROUND_HALF_UP);
 	}
@@ -32,7 +28,7 @@ public class Account {
 	public void withdraw(String withdrawAmount) {
 		BigDecimal withdrawal = new BigDecimal(withdrawAmount);
 		if (withdrawal.compareTo(accountBalance) == 1) {
-			accountBalance = accountBalance.add(accountBalance.negate());
+			accountBalance = accountBalance.subtract(accountBalance);
 		} else {
 		accountBalance = accountBalance.subtract(withdrawal);
 		}

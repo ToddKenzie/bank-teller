@@ -1,16 +1,13 @@
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Bank {
 
+	Map<String, Client> clients = new HashMap<>();
 	Map<String, Account> accounts = new HashMap<>();
-	private String accessPin;
 	
-	public Bank(String accessPin) {
-		this.accessPin = accessPin;
-	}
-
 	public void openNewAccount(Account account) {
 		accounts.put(account.getAccountNumber(), account);
 	}
@@ -27,8 +24,22 @@ public class Bank {
 		accounts.remove(accountNumber);
 	}
 
-	public boolean verifyAccess(String userEnteredPin) {
-		return (userEnteredPin.equals(accessPin));
+	public void addClient(Client client) {
+		clients.put(client.getClientName(), client);
 	}
+	
+	public Client retrieveClientInfo(String clientName) {
+		return clients.get(clientName);
+	}
+
+	public Collection<Account> accessClientAccounts(Client client) {
+		Collection<String> clientAccountNumbers = client.getClientAccounts();
+		Collection<Account> clientAccounts = new ArrayList<>();
+		for (String clientAccountNumber : clientAccountNumbers) {
+			clientAccounts.add(getAccount(clientAccountNumber));
+		}
+		return clientAccounts;
+	}
+
 
 }

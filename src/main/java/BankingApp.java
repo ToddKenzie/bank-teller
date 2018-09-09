@@ -1,5 +1,6 @@
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Scanner;
@@ -14,23 +15,44 @@ public class BankingApp {
 	private static Scanner input;
 	private static NumberFormat currency = NumberFormat.getCurrencyInstance(Locale.US);
 	private static Collection<Account> bankAccounts;
+	private static Client clientAccessingBank;
 	
-	public static void bankStartUp() {
-		wcciBank = new Bank("1234");
-		Account accountA = new Account("1234", "Checking", "2000");
-		Account accountB = new Account("5678", "Savings", "5000");
-		wcciBank.openNewAccount(accountA);
-		wcciBank.openNewAccount(accountB);
-		input = new Scanner(System.in);
-	}
-
 	public static void banking() {
 		bankStartUp();
 		gainAccess();
 		bankMenu();
 	}
+	
+	public static void bankStartUp() {
+		wcciBank = new Bank();
+		bankStartUpTodd();
+		bankStartUpAlan();
+		input = new Scanner(System.in);
+	}
+	
+	public static void bankStartUpTodd() {
+		wcciBank.openNewAccount(new Account("2727", "Checking", "3000"));
+		wcciBank.openNewAccount(new Account("2728", "Savings", "4000"));
+		Collection<String> toddAccounts = new ArrayList<>();
+		toddAccounts.add("2727");
+		toddAccounts.add("2728");
+		wcciBank.addClient(new Client("Todd", "5672", toddAccounts));
+	}
+
+	public static void bankStartUpAlan() {
+		wcciBank.openNewAccount(new Account("6262", "Checking", "7000"));
+		wcciBank.openNewAccount(new Account("6263", "Savings", "3000"));
+		Collection<String> alanAccounts = new ArrayList<>();
+		alanAccounts.add("6262");
+		alanAccounts.add("6263");
+		wcciBank.addClient(new Client("Alan", "1234", alanAccounts));
+	}
+
 
 	public static void gainAccess() {
+		System.out.println("Please enter your username:");
+		String clientName = input.nextLine();
+		clientAccessingBank = wcciBank.retrieveClientInfo(clientName);
 		if (!hasUserVerifiedPin()) {
 			denyAccess();
 		}
@@ -44,7 +66,7 @@ public class BankingApp {
 		do {
 			System.out.println("Please enter your PIN to access your accounts");
 			String userEnteredPin = input.nextLine();
-			isEnteredPinCorrect = wcciBank.verifyAccess(userEnteredPin);
+			isEnteredPinCorrect = clientAccessingBank.verifyAccess(userEnteredPin);
 			if (!isEnteredPinCorrect) {
 				attemptsRemainAtEnteringPin--;
 				String display = "PIN Incorrect. You have " + attemptsRemainAtEnteringPin;
@@ -61,7 +83,7 @@ public class BankingApp {
 	}
 
 	public static void displayAccounts() {
-		bankAccounts = wcciBank.getAllAccounts();
+		bankAccounts = wcciBank.accessClientAccounts(clientAccessingBank);
 		System.out.println("Current Bank Accounts");
 		for (Account account : bankAccounts) {
 			System.out.println(account);
@@ -141,6 +163,7 @@ public class BankingApp {
 					"We cannot close this account.  Please withdraw all money prior to closing the account.\n");
 		} else {
 			System.out.println("Closing account " + accountToEdit.getAccountNumber() + "\n");
+			clientAccessingBank.getClientAccounts().remove(accountToEdit.getAccountNumber());
 			wcciBank.closeAccount(accountToEdit.getAccountNumber());
 		}
 	}
@@ -163,6 +186,8 @@ public class BankingApp {
 		String accountNumber = generateAccountNumber();
 		Account newAccount = new Account(accountNumber, accountType, "0");
 		wcciBank.openNewAccount(newAccount);
+		bankAccounts.add(newAccount);
+		clientAccessingBank.getClientAccounts().add(accountNumber);
 		System.out.println("Account " + accountNumber + " created.\n");
 	}
 
@@ -189,6 +214,9 @@ public class BankingApp {
 
 	private static Account retrieveAccount() {
 		String accountNumber = input.nextLine();
+		if (!bankAccounts.contains(wcciBank.getAccount(accountNumber))) {
+			return null;
+		}
 		return wcciBank.getAccount(accountNumber);
 	}
 
