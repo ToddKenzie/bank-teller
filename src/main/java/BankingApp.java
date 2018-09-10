@@ -19,9 +19,24 @@ public class BankingApp {
 	
 	public static void banking() {
 		bankStartUp();
-		gainAccess();
-		bankMenu();
+		runApp();
 	}
+	
+	public static void runApp() {
+		boolean isThereAnotherClientWhoNeedsAccess;
+		do {
+			gainAccess();
+			bankMenu();
+			isThereAnotherClientWhoNeedsAccess = checkForNextUser();
+		} while (isThereAnotherClientWhoNeedsAccess);
+	}
+	
+	public static boolean checkForNextUser() {
+		System.out.println("\nIs there another client waiting to use the app? (Y / N)");
+		String userInput = input.nextLine();
+		return (userInput.equalsIgnoreCase("Y"));
+	}
+	
 	
 	public static void bankStartUp() {
 		wcciBank = new Bank();
@@ -50,14 +65,25 @@ public class BankingApp {
 
 
 	public static void gainAccess() {
-		System.out.println("Please enter your username:");
-		String clientName = input.nextLine();
-		clientAccessingBank = wcciBank.retrieveClientInfo(clientName);
+		verifyUserName();
 		if (!hasUserVerifiedPin()) {
 			denyAccess();
 		}
 		System.out.println("\nWelcome to the Bank of We Can Code IT!");
 		displayAccounts();
+	}
+	
+	public static void verifyUserName() {
+		boolean isUserNameInvalid;
+		do {
+			System.out.println("Please enter your username (Case sensitive):");
+			String clientName = input.nextLine();	
+			clientAccessingBank = wcciBank.retrieveClientInfo(clientName);
+			isUserNameInvalid = (clientAccessingBank == null) ? true : false;
+			if (isUserNameInvalid) {
+				System.out.println("Unrecognized user.");
+			}
+		} while (isUserNameInvalid);
 	}
 
 	public static boolean hasUserVerifiedPin() {
@@ -92,11 +118,12 @@ public class BankingApp {
 	}
 
 	public static void bankMenu() {
+		boolean continueBanking;
 		do {
 			displayMainMenu();
 			String userMainInput = input.nextLine();
-			executeMainMenuCommand(userMainInput);
-		} while (true);
+			continueBanking = executeMainMenuCommand(userMainInput);
+		} while (continueBanking);
 	}
 
 	public static void displayMainMenu() {
@@ -109,7 +136,7 @@ public class BankingApp {
 		System.out.println(display);
 	}
 
-	private static void executeMainMenuCommand(String userMainInput) {
+	private static boolean executeMainMenuCommand(String userMainInput) {
 		if (userMainInput.equals("1") && !bankAccounts.isEmpty()) {
 			executeDeposit();
 		} else if (userMainInput.equals("2") && !bankAccounts.isEmpty()) {
@@ -122,9 +149,11 @@ public class BankingApp {
 			createNewAccount();
 		} else if (userMainInput.equals("0")) {
 			exitProgram();
+			return false;
 		} else {
 			System.out.println("Invalid command.");
 		}
+		return true;
 	}
 
 	private static void executeDeposit() {
@@ -247,7 +276,6 @@ public class BankingApp {
 	
 	private static void exitProgram() {
 		System.out.println("Thank you for banking with us.");
-		System.exit(0);
 	}
 
 }

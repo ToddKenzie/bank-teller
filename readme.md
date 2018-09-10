@@ -15,3 +15,4 @@ To create a bank that holds multiple accounts.  User will interface with the ban
 *	Clients hold ArrayList of Account Numbers they have access to
 *	Client can opt to create a new account while at the bank
 	*	Bank will create a new bank account for this - it will not match any existing account number at the bank
+*	Upon leaving, app will ask if another person needs to use the app, then re-start the authorization process
