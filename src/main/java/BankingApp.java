@@ -175,19 +175,19 @@ public class BankingApp {
 	}
 	
 	private static void verifyWithdrawAmount(Account accountToEdit, String withdrawAmount) {
-		BigDecimal withdrawal = new BigDecimal(withdrawAmount);
+		Money withdrawal = new Money(withdrawAmount);
 		if (withdrawal.compareTo(accountToEdit.checkAccountBalance()) == 1) {
 			System.out.println("That is more money than exists in the account.");
-			System.out.println(convertToCurrency(accountToEdit.checkAccountBalance()) + " will be withdrawn instead");
+			System.out.println((accountToEdit.checkAccountBalance()) + " will be withdrawn instead");
 			withdrawal = accountToEdit.checkAccountBalance();
 		}
-		System.out.println(convertToCurrency(withdrawal) + " was withdrawn from the account\n");
+		System.out.println((withdrawal) + " was withdrawn from the account\n");
 	}
 
 	private static void executeAccountClosure() {
 		String endOfPrompt = "close";
 		Account accountToEdit = validateAccountToEdit(endOfPrompt);
-		if (accountToEdit.checkAccountBalance().compareTo(BigDecimal.ZERO) > 0) {
+		if (accountToEdit.checkAccountBalance().compareTo(Money.ZERO) > 0) {
 			System.out.println(
 					"We cannot close this account.  Please withdraw all money prior to closing the account.\n");
 		} else {
@@ -266,14 +266,10 @@ public class BankingApp {
 	}
 
 	private static String convertToCurrency(String value) {
-		BigDecimal money = new BigDecimal(value);
-		return currency.format(money);
+		Money money = new Money(value);
+		return currency.format(money.getValue());
 	}
 
-	private static String convertToCurrency(BigDecimal value) {
-		return currency.format(value);
-	}
-	
 	private static void exitProgram() {
 		System.out.println("Thank you for banking with us.");
 	}

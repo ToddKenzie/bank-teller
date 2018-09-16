@@ -8,6 +8,7 @@ To create a bank that holds multiple accounts.  User will interface with the ban
 
 ### Additional Functions of the Bank
 
+*	Created Money class to handle monetary values through the app
 *	Created a Client class to handle individual clients 
 	*	Not all bank accounts are accessible by everyone, right????
 *	Clients have individual PIN codes, proving who they are to the bank

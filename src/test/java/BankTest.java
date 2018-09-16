@@ -6,7 +6,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -21,11 +20,11 @@ public class BankTest {
 	Collection<String> userAccounts;
 	
 	//testing values only
-	BigDecimal assert100 = new BigDecimal("100");
-	BigDecimal assert200 = new BigDecimal("200");
-	BigDecimal assert300 = new BigDecimal("300");
-	BigDecimal assert50 = new BigDecimal("50");
-	BigDecimal assert0 = new BigDecimal("0");
+	Money assert100 = new Money("100");
+	Money assert200 = new Money("200");
+	Money assert300 = new Money("300");
+	Money assert50 = new Money("50");
+	Money assert0 = new Money("0");
 	
 	@Before
 	public void setUp() {
@@ -49,8 +48,8 @@ public class BankTest {
 	@Test
 	public void assertBankAccountBalanceIs100() {
 		Account retrievedAccount = underTest.getAccount("1");
-		BigDecimal accountBalance = retrievedAccount.checkAccountBalance();
-		assertThat(accountBalance, is(assert100.setScale(2, BigDecimal.ROUND_HALF_UP)));
+		Money accountBalance = retrievedAccount.checkAccountBalance();
+		assertThat(accountBalance.getValue(), is(assert100.getValue()));
 		
 	}
 	
@@ -73,32 +72,32 @@ public class BankTest {
 	public void assertThatDepositInAct1for100MakesBalance200() {
 		Account retrievedAccount = underTest.getAccount(account1.getAccountNumber());
 		retrievedAccount.deposit("100");
-		assertThat(retrievedAccount.checkAccountBalance(), is(assert200.setScale(2, BigDecimal.ROUND_HALF_UP)));
+		assertThat(retrievedAccount.checkAccountBalance().getValue(), is(assert200.getValue()));
 	}
 
 	@Test
 	public void assertThatDepositInAct1for200MakesBalance300() {
 		Account retrievedAccount = underTest.getAccount(account1.getAccountNumber());
 		retrievedAccount.deposit("200");
-		assertThat(retrievedAccount.checkAccountBalance(), is(assert300.setScale(2, BigDecimal.ROUND_HALF_UP)));
+		assertThat(retrievedAccount.checkAccountBalance().getValue(), is(assert300.getValue()));
 	}
 	
 	@Test
 	public void assertThatWithdrawInAct1For50MakesBalance50() {
 		account1.withdraw("50");
-		assertThat(account1.checkAccountBalance(), is(assert50.setScale(2, BigDecimal.ROUND_HALF_UP)));
+		assertThat(account1.checkAccountBalance().getValue(), is(assert50.getValue()));
 	}
 	
 	@Test
 	public void assertThatWithdrawInAct1For100MakesBalance0() {
 		account1.withdraw("100");
-		assertThat(account1.checkAccountBalance(), is(assert0.setScale(2, BigDecimal.ROUND_HALF_UP)));
+		assertThat(account1.checkAccountBalance().getValue(), is(assert0.getValue()));
 	}
 	
 	@Test
 	public void assertThatWithdrawInAct1For200MakesBalance0() {
 		account1.withdraw("200");
-		assertThat(account1.checkAccountBalance(), is(assert0.setScale(2, BigDecimal.ROUND_HALF_UP)));
+		assertThat(account1.checkAccountBalance().getValue(), is(assert0.getValue()));
 	}
 	
 	@Test
@@ -133,5 +132,9 @@ public class BankTest {
 		Collection<Account> myAccounts = underTest.accessClientAccounts(client1);
 		assertThat(myAccounts, containsInAnyOrder(account1));
 	}
+	
+	//account transfer
+	//account merge
+	//co-ownership
 	
 }
